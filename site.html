@@ -121,26 +121,15 @@
     </div>
 
     <script>
-        // Funktion zum Abrufen der aktuellen Uhrzeit und zum Aktualisieren der Anzeige
-        function updateClock() {
-            const now = new Date();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            document.getElementById('current-time').textContent = `${hours}:${minutes}`;
-        }
-        setInterval(updateClock, 1000); // Aktualisiert jede Sekunde die Uhrzeit
-        updateClock(); // Initiales Aufrufen der Uhrzeit
-
         // Funktion zum Abrufen der Abfahrtsdaten von beiden Haltestellen
         async function fetchDepartures() {
             try {
-                const wieckestraßeResponse = await fetch("http://widgets.vvo-online.de/abfahrtsmonitor/Abfahrten.do?hst=wiekestra%C3%9Fe&vz=0&ort=Dresden&lim=12");
-                const wieckestraßeData = await wieckestraßeResponse.json();
+                // Rufe die Abfahrtsdaten von deinem Flask-Backend ab
+                const response = await fetch("/api/abfahrten");
+                const data = await response.json();
     
-                const wasaPlatzResponse = await fetch("http://widgets.vvo-online.de/abfahrtsmonitor/Abfahrten.do?hst=wasaplatz&vz=0&ort=Dresden&lim=30");
-                const wasaPlatzData = await wasaPlatzResponse.json();
-    
-                updateTable(wieckestraßeData, wasaPlatzData);
+                // Verwende die abgerufenen Daten, um die Tabelle zu aktualisieren
+                updateTable(data.wieckestraße, data.wasaPlatz);
             } catch (error) {
                 console.error("Fehler beim Abrufen der Daten:", error);
             }
@@ -152,20 +141,20 @@
             currentTime.setMinutes(currentTime.getMinutes() + minutesFromNow);
             return currentTime.toTimeString().slice(0, 5); // Gibt die Uhrzeit im Format HH:MM zurück
         }
-
+    
         // Funktion zur Aktualisierung der Tabelle
         function updateTable(wieckestraßeData, wasaPlatzData) {
             const tableBody = document.getElementById("departure-data");
             tableBody.innerHTML = "";
-
+    
             wieckestraßeData.forEach(item => {
                 const departureTimeWieckestraße = parseInt(item[2] || "0");
                 const arrivalTimeWasaPlatz = departureTimeWieckestraße + 7; // Ankunft am Wasaplatz
-
+    
                 let umstiegTime = "N/A";
                 let arrivalTimeTU = "N/A";
                 let arrivalTimeTUFormatted = "N/A";
-
+    
                 for (const wasaItem of wasaPlatzData) {
                     if (wasaItem[0] === "61") { // Sucht Linie 61 für Umstieg
                         const departureTimeWasaPlatz = parseInt(wasaItem[2] || "0");
@@ -178,7 +167,7 @@
                         }
                     }
                 }
-
+    
                 const row = document.createElement("tr");
                 row.innerHTML = `
                     <td>${item[0]}</td>
@@ -192,7 +181,7 @@
         }
     
         // Daten alle 30 Sekunden aktualisieren
-        setInterval(fetchDepartures, 3000);  // Ändert das Intervall auf 30 Sekunden
+        setInterval(fetchDepartures, 30000);  // Ändert das Intervall auf 30 Sekunden
         fetchDepartures();
     </script>
 </body>
