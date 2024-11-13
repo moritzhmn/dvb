@@ -1,7 +1,8 @@
 from flask import Flask, jsonify, send_from_directory
 import requests
 import os
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
+import pytz 
 
 app = Flask(__name__)
 
@@ -14,7 +15,9 @@ def home():
 # Route für die Uhrzeit
 @app.route('/api/zeit')
 def get_time():
-    current_time = datetime.now().strftime('%H:%M')
+    # Festlegen der Zeitzone auf Mitteleuropäische Zeit (MEZ/MESZ)
+    timezone = pytz.timezone('Europe/Berlin')
+    current_time = datetime.now(timezone).strftime('%H:%M')
     return jsonify({"time": current_time})
 
 # Route für die Abfahrtsdaten
