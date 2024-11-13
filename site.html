@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Umstiegsmonitor: Wieckestraße → TU Dresden</title>
+    <style>
+        /* Grundlegende Stile */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #1e1e1e;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .monitor {
+            background-color: #121212;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            padding: 20px 30px;
+            width: 100%;
+            max-width: 1200px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            text-align: center;
+            color: #ffcc00;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ffcc00;
+            padding-bottom: 10px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .time {
+            font-size: 1.5rem;
+            color: #ffcc00;
+        }
+
+        .logo img {
+            height: 50px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 1.2rem;
+        }
+
+        th, td {
+            padding: 16px 20px;
+            text-align: left;
+            border-bottom: 1px solid #333;
+        }
+
+        th {
+            color: #ffcc00;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        td {
+            color: #ddd;
+        }
+
+        .umstieg {
+            color: #ff5555;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="monitor">
+        <!-- Header mit Logo und Uhrzeit -->
+        <div class="header">
+            <div class="logo">
+                <img src="https://dfi.dvb.de/logo/dvb.jpg" alt="DVB Logo">
+            </div>
+            <div class="time" id="current-time">--:--</div>
+        </div>
+
+        <h1>Umstiegsmonitor: Wieckestraße → TU Dresden</h1>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Linie</th>
+                    <th>Ziel</th>
+                    <th>Abfahrt</th>
+                    <th>Umstieg (Linie 61)</th>
+                    <th>Ankunft TU Dresden (FFP)</th>
+                </tr>
+            </thead>
+            <tbody id="departure-data">
+                <!-- Dynamische Abfahrtsdaten werden hier eingefügt -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Funktion zum Abrufen der aktuellen Uhrzeit und zum Aktualisieren der Anzeige
+        function updateClock() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('current-time').textContent = `${hours}:${minutes}`;
+        }
+        setInterval(updateClock, 1000); // Aktualisiert jede Sekunde die Uhrzeit
+        updateClock(); // Initiales Aufrufen der Uhrzeit
+
+        // Funktion zum Abrufen der Abfahrtsdaten von beiden Haltestellen
+        async function fetchDepartures() {
+            try {
+                const wieckestraßeResponse = await fetch("http://widgets.vvo-online.de/abfahrtsmonitor/Abfahrten.do?hst=wiekestra%C3%9Fe&vz=0&ort=Dresden&lim=12");
+                const wieckestraßeData = await wieckestraßeResponse.json();
+    
+                const wasaPlatzResponse = await fetch("http://widgets.vvo-online.de/abfahrtsmonitor/Abfahrten.do?hst=wasaplatz&vz=0&ort=Dresden&lim=30");
+                const wasaPlatzData = await wasaPlatzResponse.json();
+    
+                updateTable(wieckestraßeData, wasaPlatzData);
+            } catch (error) {
+                console.error("Fehler beim Abrufen der Daten:", error);
+            }
+        }
+    
+        // Funktion zur Berechnung der Uhrzeit basierend auf der aktuellen Zeit und zusätzlichen Minuten
+        function calculateTime(minutesFromNow) {
+            const currentTime = new Date();
+            currentTime.setMinutes(currentTime.getMinutes() + minutesFromNow);
+            return currentTime.toTimeString().slice(0, 5); // Gibt die Uhrzeit im Format HH:MM zurück
+        }
+
+        // Funktion zur Aktualisierung der Tabelle
+        function updateTable(wieckestraßeData, wasaPlatzData) {
+            const tableBody = document.getElementById("departure-data");
+            tableBody.innerHTML = "";
+
+            wieckestraßeData.forEach(item => {
+                const departureTimeWieckestraße = parseInt(item[2] || "0");
+                const arrivalTimeWasaPlatz = departureTimeWieckestraße + 7; // Ankunft am Wasaplatz
+
+                let umstiegTime = "N/A";
+                let arrivalTimeTU = "N/A";
+                let arrivalTimeTUFormatted = "N/A";
+
+                for (const wasaItem of wasaPlatzData) {
+                    if (wasaItem[0] === "61") { // Sucht Linie 61 für Umstieg
+                        const departureTimeWasaPlatz = parseInt(wasaItem[2] || "0");
+                        if (departureTimeWasaPlatz > arrivalTimeWasaPlatz) {
+                            // Berechnung der Umstiegszeit und finalen Ankunftszeit an der TU
+                            umstiegTime = departureTimeWasaPlatz - arrivalTimeWasaPlatz;
+                            arrivalTimeTU = departureTimeWieckestraße + 7 + umstiegTime + 6; // Gesamtzeit bis zur TU
+                            arrivalTimeTUFormatted = calculateTime(arrivalTimeTU); // Konvertiert Ankunftszeit zur Uhrzeit
+                            break;
+                        }
+                    }
+                }
+
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${item[0]}</td>
+                    <td>${item[1]}</td>
+                    <td>${item[2] || "Jetzt"}</td>
+                    <td class="umstieg">${umstiegTime !== "N/A" ? `${umstiegTime} Min` : umstiegTime}</td>
+                    <td class="ankunft">${arrivalTimeTU !== "N/A" ? `${arrivalTimeTU} Min (${arrivalTimeTUFormatted})` : arrivalTimeTU}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+    
+        // Daten alle 30 Sekunden aktualisieren
+        setInterval(fetchDepartures, 3000);  // Ändert das Intervall auf 30 Sekunden
+        fetchDepartures();
+    </script>
+</body>
+</html>
