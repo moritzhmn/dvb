@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, send_from_directory
 import requests
 import os
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -9,6 +10,12 @@ app = Flask(__name__)
 def home():
     # Wenn die HTML-Datei im Verzeichnis 'static' liegt
     return send_from_directory(os.getcwd(), 'site.html')
+
+# Route für die Uhrzeit
+@app.route('/api/zeit')
+def get_time():
+    current_time = datetime.now().strftime('%H:%M')
+    return jsonify({"time": current_time})
 
 # Route für die Abfahrtsdaten
 @app.route('/api/abfahrten')
