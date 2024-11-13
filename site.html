@@ -18,10 +18,10 @@
             color: #fff;
             display: flex;
             justify-content: center;
-            align-items: center;
-            height: 100vh;
+            align-items: flex-start; /* Inhalt oben ausrichten */
+            min-height: 100vh; /* Sicherstellen, dass der gesamte Bildschirm verwendet wird */
             margin: 0;
-            overflow: auto;
+            overflow: auto; /* Verhindert das Abschneiden bei Überlauf */
         }
 
         .monitor {
@@ -60,7 +60,7 @@
         }
 
         .logo img {
-            height: 50px;
+            height: 50px; /* Standardgröße des Logos */
         }
 
         table {
@@ -91,27 +91,36 @@
             font-weight: bold;
         }
 
-        /* Responsive Design */
+        /* Responsive Design für verschiedene Bildschirmgrößen */
         @media (max-width: 768px) {
             h1 {
                 font-size: 2rem;
             }
+
             .monitor {
-                padding: 15px;
+                padding: 10px 15px; /* Weniger Innenabstand für Tablets */
             }
+
             .header {
                 flex-direction: column;
                 align-items: flex-start;
             }
+
             .time {
                 font-size: 1.2rem;
                 margin-top: 10px;
             }
+
             table {
                 font-size: 1rem;
             }
+
             th, td {
-                padding: 12px;
+                padding: 10px 12px; /* Kleinere Polsterung auf Tablets */
+            }
+
+            .logo img {
+                height: 40px; /* Kleinere Logo-Größe für Tablets */
             }
         }
 
@@ -119,8 +128,17 @@
             h1 {
                 font-size: 1.5rem;
             }
+
             table {
                 font-size: 0.9rem;
+            }
+
+            th, td {
+                padding: 8px 10px; /* Noch kleinere Polsterung für Smartphones */
+            }
+
+            .logo img {
+                height: 30px; /* Noch kleinere Logo-Größe für Smartphones */
             }
         }
     </style>
