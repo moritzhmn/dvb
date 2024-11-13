@@ -6,4 +6,4 @@ app = Flask(__name__, static_folder='public')
 # Route für die Startseite (HTML)
 @app.route('/')
 def home():
-    return send_from_directory('public', 'site.html')
+    return send_from_directory('.', 'site.html')
