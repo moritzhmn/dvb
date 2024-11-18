@@ -207,6 +207,8 @@
             tableBody.innerHTML = "";
 
             wieckestraßeData.forEach(item => {
+                if (item[1] !== "Kaditz") return;
+
                 const departureTimeWieckestraße = parseInt(item[2] || "0");
                 const arrivalTimeWasaPlatz = departureTimeWieckestraße + 7;
 
@@ -215,7 +217,7 @@
                 let arrivalTimeTUFormatted = "N/A";
 
                 for (const wasaItem of wasaPlatzData) {
-                    if (wasaItem[0] === "61") {
+                    if (wasaItem[0] === "61" && wasaItem[1] === "Löbtau") {
                         const departureTimeWasaPlatz = parseInt(wasaItem[2] || "0");
                         if (departureTimeWasaPlatz > arrivalTimeWasaPlatz) {
                             umstiegTime = departureTimeWasaPlatz - arrivalTimeWasaPlatz;
