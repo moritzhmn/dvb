@@ -233,8 +233,8 @@
                     <td>${item[0]}</td>
                     <td>${item[1]}</td>
                     <td>${item[2] || "Jetzt"}</td>
-                    <td class="umstieg">${umstiegTime !== "N/A" ? `${umstiegTime} Min` : umstiegTime}</td>
-                    <td class="ankunft">${arrivalTimeTU !== "N/A" ? `${arrivalTimeTU} Min (${arrivalTimeTUFormatted})` : arrivalTimeTU}</td>
+                    <td class="umstieg">${umstiegTime !== "Cool bleiben" ? `${umstiegTime} Min` : umstiegTime}</td>
+                    <td class="ankunft">${arrivalTimeTU !== "Bleib locker" ? `${arrivalTimeTU} Min (${arrivalTimeTUFormatted})` : arrivalTimeTU}</td>
                 `;
                 tableBody.appendChild(row);
             });
