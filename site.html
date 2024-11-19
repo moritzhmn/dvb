@@ -223,6 +223,7 @@
                             umstiegTime = departureTimeWasaPlatz - arrivalTimeWasaPlatz;
                             arrivalTimeTU = departureTimeWieckestraße + 7 + umstiegTime + 6;
                             arrivalTimeTUFormatted = calculateTime(arrivalTimeTU);
+                            time_in_vehicle = 13 + umstiegTime;
                             break;
                         }
                     }
@@ -234,7 +235,7 @@
                     <td>${item[1]}</td>
                     <td>${item[2] || "Jetzt"}</td>
                     <td class="umstieg">${umstiegTime !== "Cool bleiben" ? `${umstiegTime} Min` : umstiegTime}</td>
-                    <td class="ankunft">${arrivalTimeTU !== "Bleib locker" ? `${arrivalTimeTU} Min (${arrivalTimeTUFormatted})` : arrivalTimeTU}</td>
+                    <td class="ankunft">${arrivalTimeTU !== "Bleib locker" ? `${time_in_vehicle} Min (${arrivalTimeTUFormatted})` : arrivalTimeTU}</td>
                 `;
                 tableBody.appendChild(row);
             });
